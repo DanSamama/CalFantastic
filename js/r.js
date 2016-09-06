@@ -1,7 +1,9 @@
 var R = {};
+//NameSpace that we can use
 
 R.init = function(){
   $(document).ready(function(){
+      //Firing all the functions that we define from line 40
         R.sortBlockList();
       R.initRepository();
       $(".left-panel").resizable({
@@ -11,6 +13,7 @@ R.init = function(){
         resizeWidth: false
       });
 
+      //Make the activities sortable between them. Being able to drag them
       $( ".repository .container" ).sortable({
 			  revert: true,
   			"axis":"y",
@@ -21,13 +24,12 @@ R.init = function(){
       $( ".block-list .container" ).sortable({
           revert: true,
           stop:function(event, ui){
+              //Firing function line 64
             R.scheduleActivity(ui.item);
           },
   			"axis":"y",
 			  containment: "parent"
 		  });
-
-
 
 		$( "ul, li" ).disableSelection();
 
@@ -38,8 +40,9 @@ R.init = function(){
 R.initRepository = function(){
     $(".repository .slot .add").click(function(e){
         e.stopPropagation();
+        //This variable return the closest slot that is next to where the user is clicking
         var currentActivity = $(this).closest(".slot");
-        $(".block-list .container").append(activity);
+        $(".block-list .container").append(currentActivity);
         R.scheduleActivity(currentActivity);
     });
 };

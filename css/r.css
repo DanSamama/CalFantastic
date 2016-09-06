@@ -136,6 +136,9 @@ ul{
 .container .slot.lecture{
 	background-color:#B84F13;	
 }
+.container .slot.assignment{
+	background-color:darkred;
+}
 
 .wide-btn{
 	background-color:green;
