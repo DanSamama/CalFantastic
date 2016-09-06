@@ -34,7 +34,7 @@ R.init = function(){
   });
 }; 
 
-
+//after clicking "add" activity form, it takes the slot that contains this "add btn" and append the slot to the "chronolist" container in the html
 R.initRepository = function(){
     $(".repository .slot .add").click(function(e){
         e.stopPropagation();
@@ -48,6 +48,7 @@ R.sortBlockList = function(){
     $(".block-list .slot").each(function(e){
         var currentActivity = $(this);
         var nextActivityId = currentActivity.attr("data-next");
+        //if there is no "next activity" that means that its the "last" slot in the chronolist
         if (nextActivityId){
             $(".slot#" + nextActivityId).before(currentActivity)
         }else{
