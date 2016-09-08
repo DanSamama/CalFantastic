@@ -104,25 +104,106 @@ class CreateDb(webapp2.RequestHandler):
 class ScheduleActivity(webapp2.RequestHandler):
     def get(self):
         activityId = self.request.get("activity_id")
-        prevActivityId = self.request.get("prev_activity_id")
-        nextActivityId = self.request.get("next_activity_id")
-        #PUSH THE EXTRA DATA
+        currentNextId = self.request.get("current_next_id")
+        currentPrevId = self.request.get("current_prev_id")
+        originalNextId = self.request.get("original_next_id")
+        originalPrevId = self.request.get("original_prev_id")
+
+        if originalPrevId == "None":
+            pass
+            #console.log("i was first");
+        else:
+            #i was not first, my original prev should point at my original next
+            logging.info("updating " + originalPrevId  + " to point at " + originalNextId)
+            originalPrev = db.getActivityById(originalPrevId)
+            if originalPrev:
+                originalPrev.next = originalNextId
+                originalPrev.put()
+
+        if currentNextId == "None":
+            #i am now last
+            activity = db.getActivityById(activityId)
+            if activity:
+                activity.next = None
+                activity.status = "IN_CHRONOLIST"
+                activity.put()
+        else:
+            #i am not last now
+            logging.info("updating " + activityId + " to point at " + currentNextId)
+            activity = db.getActivityById(activityId)
+            if activity:
+                activity.next = currentNextId
+                activity.status = "IN_CHRONOLIST"
+                activity.put()
+
+        if originalNextId == "None":
+            pass
+            # i was last, my original prev is now last
+            # originalPrev = db.getActivityById(originalPrevId)
+            # if originalPrev:
+            #     originalPrev.next = None
+            #     originalPrev.put()
+
+        else:
+            pass
+            #console.log("i was not last");
+
+        if currentPrevId == "None":
+            pass
+            #console.log("i am now first");
+        else:
+            #i am not first now
+            logging.info("updating " + currentPrevId + " to point at " + activityId)
+            currentPrev = db.getActivityById(currentPrevId)
+            if currentPrev:
+                currentPrev.next = activityId
+                currentPrev.put()
+
+
+        # #todo add extra prop
+        # activity = db.getActivityById(activityId)
+        # if activity:
+        #     currentNext = activity.next
+        #     activity.status = "IN_CHRONOLIST"
+        #     prevActivity = db.getActivityById(prevActivityId)
+        #     if prevActivity:
+        #         prevActivity.next = activity.next
+        #
+        #
+        #     if nextActivityId:
+        #         activity.next = nextActivityId
+        #         nexActivity = db.getActivityById(nextActivityId)
+        #         if prevActivity:
+        #             prevActivity.next = activityId
+        #         #nexActivity.next = currentNext
+        #         #nexActivity.put()
+        #     else:
+        #         activity.next = None
+        #     activity.put()
+
+        # if prevActivity:
+        #     prevActivity.next = activityId
+        #     prevActivity.put()
+
+class MarkAsLast(webapp2.RequestHandler):
+    def get(self):
+        activityId = self.request.get("activity_id")
         activity = db.getActivityById(activityId)
         if activity:
-            activity.status = "IN_CHRONOLIST"
-            activity.next = nextActivityId
+            activity.next = None
             activity.put()
-        prevActivity = db.getActivityById(prevActivityId)
-        prevActivity.next = activityId
 
-        prevActivity.put()
+
 
 
 app = webapp2.WSGIApplication([
     ('/', MainHandler),
     ('/activity', ActivityForm),
     ('/calendarForm',CalendarForm),
-    ('/schedule_activity', ScheduleActivity)
+    ('/schedule_activity', ScheduleActivity),
+    ('/mark_as_last', MarkAsLast),
+
+    ('/create_db', CreateDb)
 
 ], debug=True)
 
