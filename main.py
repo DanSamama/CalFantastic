@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 import os
+import logging
 import webapp2
 import models
 import db
 from webapp2_extras import routes
 from uuid import uuid4
 import jinja2
-import logging
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+
 
 
 def getAppVersion():
@@ -99,7 +100,6 @@ class CreateDb(webapp2.RequestHandler):
             newActivity.time_slots = a['time_slots']
             newActivity.status = "IN_REPOSITORY"
             newActivity.put()
-
 
 class ScheduleActivity(webapp2.RequestHandler):
     def get(self):
@@ -206,6 +206,3 @@ app = webapp2.WSGIApplication([
     ('/create_db', CreateDb)
 
 ], debug=True)
-
-
-

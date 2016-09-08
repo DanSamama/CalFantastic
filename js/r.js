@@ -6,6 +6,8 @@ R.init = function(){
         //Firing all the functions that we define from line 40
         R.sortBlockList();
         R.initRepository();
+        R.calculateActivityTime();
+        R.generateWeek(0);
         $(".left-panel").resizable({
             resizeHeight: false
         });
@@ -36,95 +38,59 @@ R.init = function(){
 
     });
 };
-//
-// function calendar(week, days, hours)
-// {
-//     this.week = week;
-//     this.days = days;
-//     this.hours = hours;
-//
-//
-// }
-//
-// calendar.prototype.init = function(activity)
-// {
-//
-// }
-// calendar.prototype.injectActivity= function(activity)
-// {
-//
-// }
-//
-//
-// var ItcCalendar = new calendar(20, 5 , 9);
-//
-// ItcCalendar.injectActivity()
 
+R.calculateActivityTime = function () {
+    //print on every activity its date and calendar hours based on its index position
 
-
-
-//print on every activity its date and calendar hours based on its index position
-$("#generateCalendar").click(function () {
-    var nextActivityId =  "nextActivityId";
-    var currentWeek = 1;
-    var totalPrevDailyActivities = 0;
-    var dayStartingHour = 9;
-    var dayEndingHour = 17;
+    //var currentWeek = 1;
+    //var dayStartingHour = 9;
+    //var dayEndingHour = 17;
+    var numOfWeeks = 20;
     var dailyLength = 8;
+    var daysInWeek = 5;
+    var hoursInAweek = dailyLength * daysInWeek;
+    var hoursCounter = 0;
+    var hoursSkipped = 0;
 
-    R.getFirstActivity = function () {
-
-        //get all the activity slots in the chronolist and loop through to find the first slot (the only one that has no "previous" activity.
-        $(".block-list" > li).each(function (e) {
-            activity = $(this);
-            if( activity.prev() === -1){
-                firstAct = $(this);
-                var length = activity.time_slots;
-                var activityId = activity.id;
-                var nextActivityId = get.request("next");
-
-                var firstActDate = get.request("project_starting_day");
-                var activityStart = dayStartingHour;
-                var activityEnd = dayStartingHour + length;
-                var dailyLength = (dayEndingHour) - (dayStartingHour);
-                dailyLength -= length;
-                totalPrevDailyActivities += length;
-
-                return ({firstActDate:"firstActDate", dayStartingHour: "dayStartingHour", dayEndingHour:"dayEndingHour"})
-            }
-        });
-
-        R.getRestActivities = function () {
-
-            $(".block-list" > li).each(function (e) {
-                activity = $(this);
-
-                if(( activity.prev() !== -1) && (activity.id == nextActivityId) ){
-                    var length = get.request("time_slots");
-                    var nextActivityId = get.request("next");
-
-                    //check if there's enough time to schedule this activity in the current day, else- schedule to next day
-                    dailyLength -= length;
-                    totalPrevDailyActivities += length;
-                    if (dailyLength > 0) {
-                        var actDate = currentWeek;
-                        dailyLength -= length;
-                    }
-                    else {
-                        //increment the calendar by one day, and reset the daily length hours.
-                        dailyLength =  int(dayEndingHour) - int(dayStartingHour);
-                    }
-
-                    var dayStartHour = get.request("day_starting_hour");
-                    var activityStart = dayStartHour + totalPrevDailyActivities;
-                    var activityEnd = activityStart + length;
-
-                    return ({actDate: "actDate", activityStart:"activityStart", activityEnd:"activityEnd"})
-                }
-            })
+    $(".block-list .slot").each(function(){
+        var currentActivity = $(this);
+        var currentActivityLength = parseInt(currentActivity.attr("data-activity-length"));
+        var calculatedWeekNumber = Math.floor(hoursCounter / hoursInAweek);
+        var calculatedHourInCurrentWeek = hoursCounter % hoursInAweek;
+        var calculatedHour = calculatedHourInCurrentWeek % dailyLength;
+        var remaningDayHours = dailyLength - calculatedHour;
+        if (remaningDayHours  < currentActivityLength){
+            hoursSkipped += remaningDayHours;
+            hoursCounter += hoursSkipped;
+            calculatedHourInCurrentWeek = hoursCounter % hoursInAweek;
+            calculatedHour = calculatedHourInCurrentWeek % dailyLength;
         }
-    };
-});
+        var calculatedDayNumber = Math.floor(calculatedHourInCurrentWeek / dailyLength);
+        hoursCounter += currentActivityLength;
+        currentActivity.attr("data-week",calculatedWeekNumber);
+        currentActivity.attr("data-day",calculatedDayNumber);
+        currentActivity.attr("data-hour",calculatedHour);
+        currentActivity.append("week: " + calculatedWeekNumber + " day: " + calculatedDayNumber + " hour: " + calculatedHour)
+    });
+
+};
+
+R.generateWeek = function(weekNum){
+    var weekActivities = $(".block-list .slot[data-week="+weekNum+"]");
+    weekActivities.each(function(){
+       var currentActivity = $(this);
+         var currentActivityLength = parseInt(currentActivity.attr("data-activity-length"));
+        var currentActivityDay = currentActivity.attr("data-day");
+        var relevantDay = $(".week-schedule .day[data-day="+ currentActivityDay +"]");
+        var activityRepresentation = $("<div />").addClass("scheduled-activity").text(currentActivity.attr("data-activity-title"));
+        activityRepresentation.css("height",50 * currentActivityLength);
+        relevantDay.find(".content").append(activityRepresentation);
+    });
+
+};
+
+
+
 
 
 //after clicking "add" activity form, it takes the slot that contains this "add btn" and append the slot to the "chronolist" container in the html
@@ -147,23 +113,23 @@ R.sortBlockList = function(){
             var nextActivityId = unsortedBlock.attr("data-next");
             var unsortedBlockAndPrevSorted = unsortedBlock.add(unsortedBlock.prevUntil(".slot:not(.sorted)"));
 
-            console.log(counter +".before")
-            console.log($(".block-list .slot"))
+            console.log(counter +".before");
+            console.log($(".block-list .slot"));
             console.log(counter +". found " + unsortedBlock.attr("id") + " ---> " + nextActivityId);
-            console.log("grabbing")
-            console.log(unsortedBlockAndPrevSorted)
+            console.log("grabbing");
+            console.log(unsortedBlockAndPrevSorted);
             if (nextActivityId != "None") {
-                console.log("putting before .block-list .slot#" + nextActivityId)
+                console.log("putting before .block-list .slot#" + nextActivityId);
                 var nextBlock = $(".block-list .slot#" + nextActivityId);
-                console.log(nextBlock)
+                console.log(nextBlock);
                 nextBlock.before(unsortedBlockAndPrevSorted);
             }else{
-                    console.log("putting last")
+                    console.log("putting last");
                   $(".block-list .container").append(unsortedBlockAndPrevSorted)
             }
             unsortedBlock.addClass("sorted");
-            console.log(counter +".after")
-            console.log($(".block-list .slot"))
+            console.log(counter +".after");
+            console.log($(".block-list .slot"));
             console.log(counter +". end");
             counter++;
 
@@ -176,7 +142,7 @@ R.scheduleActivity = function(activity){
     var originalNext = $(".block-list .slot#" + activity.attr("data-next"));
     var prevActivity = activity.prev();
     var nextActivity = activity.next();
-    var originalPrevId, originalNextId, currentPrevId, currentNextId
+    var originalPrevId, originalNextId, currentPrevId, currentNextId;
 
     if (originalPrev.length == 0){
         originalPrevId ="None";
@@ -187,7 +153,7 @@ R.scheduleActivity = function(activity){
     }
 
     if (nextActivity.length == 0){
-        currentNextId = "None"
+        currentNextId = "None";
         console.log("i am now last");
     }else{
          currentNextId = nextActivity.attr("id");
@@ -196,7 +162,7 @@ R.scheduleActivity = function(activity){
 
 
     if (originalNext.length == 0){
-        originalNextId = "None"
+        originalNextId = "None";
         console.log("i was last");
     }else{
         originalNextId = originalNext.attr("id");
@@ -204,7 +170,7 @@ R.scheduleActivity = function(activity){
     }
 
     if (prevActivity.length == 0){
-        currentPrevId = "None"
+        currentPrevId = "None";
         console.log("i am now first");
     }else{
         currentPrevId = prevActivity.attr("id");
@@ -214,53 +180,14 @@ R.scheduleActivity = function(activity){
 
     $.get("/schedule_activity",{"activity_id":activity.attr("id"),"current_next_id":currentNextId,"current_prev_id":currentPrevId,"original_next_id":originalNextId,"original_prev_id":originalPrevId},function(){
         //TODO: update client side (like we update server side)
+        //         R.generateCalender(prevActivity, nextActivity, activity);
+
+
     });
 
 
-
-
-
-
-
-
-
-    // if (activity.attr("data-next") == "None" && $(".block-list .slot").length > 1){
-    //     var lastActivity = $(".block-list .slot").last();
-    //     $.get("/mark_as_last",{"activity_id":lastActivity.attr("id")},function(){
-    //         lastActivity.attr("data-next","None");
-    //     });
-    // }
-    // //todo add extra prop
-    // $.get("/schedule_activity",{"activity_id":activity.attr("id"),"next_activity_id":nextActivity.attr("id"),"prev_activity_id":prevActivity.attr("id")},function(){
-    //     //We are last now
-    //     if (!nextActivity){
-    //         activity.attr("data-next","None");
-    //     }else{
-    //          activity.attr("data-next",nextActivity.attr("id"));
-    //     }
-    //     //Our new prev should point to us
-    //     if (prevActivity){
-    //         prevActivity.attr("data-next",activity.attr("id"));
-    //     }
-    // });
 };
 
 
- // activityId = self.request.get("activity_id")
- //        prevActivityId = self.request.get("prev_activity_id")
- //        nextActivityId = self.request.get("next_activity_id")
- //        #todo add extra prop
- //        activity = db.getActivityById(activityId)
- //        if activity:
- //            activity.status = "IN_CHRONOLIST"
- //            if nextActivityId:
- //                activity.next = nextActivityId
- //            else:
- //                activity.next = None
- //            activity.put()
- //        prevActivity = db.getActivityById(prevActivityId)
- //        if prevActivity:
- //            prevActivity.next = activityId
- //            prevActivity.put()
 
 R.init();

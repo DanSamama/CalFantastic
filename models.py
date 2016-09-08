@@ -24,10 +24,3 @@ class Calendar(ndb.Model):
     status = ndb.StringProperty()
     cohort = ndb.StringProperty()
     program = ndb.StringProperty()
-
-
-
-
-
-
-

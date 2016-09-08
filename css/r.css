@@ -83,6 +83,9 @@ a{
 	flex: 0 0 auto;
 	height:50%;
 	width:100%;
+	overflow-y: auto;
+    overflow-x: hidden;
+	text-align: center;
 }
 
 .bottom-panel{
@@ -101,10 +104,10 @@ a{
 .repository{
 }
 .block-list{
-    padding:20px 0px;
+
+	padding:20px 0px;
 }
-.week-schedule{
-}
+
 
 ul{
 	list-style: none;
@@ -135,7 +138,7 @@ ul{
 }
 
 .container .slot.lecture{
-	background-color:#B84F13;	
+	background-color:#B84F13;
 }
 .container .slot.assignment{
 	background-color:darkred;
@@ -156,5 +159,30 @@ ul{
 
 .block-list .slot .add{
 	display: none;
+}
+
+
+.week-schedule{
+	text-align: center;
+}
+
+.week{
+	width:100%;
+	display:inline-block;
+	margin:auto;
+}
+
+.day{
+	display: inline-block;
+	border: solid 1px #777;
+	height:500px;
+	width:100px;
+	vertical-align: top;
+}
+
+.day .scheduled-activity{
+	background-color:blue;
+	width:100%;
+	margin:5px;
 }
 
