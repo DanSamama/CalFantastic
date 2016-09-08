@@ -101,6 +101,7 @@ class CreateDb(webapp2.RequestHandler):
             newActivity.status = "IN_REPOSITORY"
             newActivity.put()
 
+
 class ScheduleActivity(webapp2.RequestHandler):
     def get(self):
         activityId = self.request.get("activity_id")

@@ -149,14 +149,17 @@ R.scheduleActivity = function(activity){
         console.log("i was first");
     }else{
         originalPrevId = originalPrev.attr("id");
+        originalPrev.attr("data-next",originalNextId);
         console.log("i was not first");
     }
 
     if (nextActivity.length == 0){
         currentNextId = "None";
+        activity.attr("data-next","None");
         console.log("i am now last");
     }else{
          currentNextId = nextActivity.attr("id");
+        activity.attr("data-next",currentNextId);
          console.log("i am not last now");
     }
 
@@ -174,6 +177,7 @@ R.scheduleActivity = function(activity){
         console.log("i am now first");
     }else{
         currentPrevId = prevActivity.attr("id");
+        prevActivity.attr("data-next",activity.id);
         console.log("i am not first now ");
     }
 
