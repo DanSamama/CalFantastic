@@ -1,0 +1,6 @@
+
+.gitignore
+.idea/workspace.xml
+db.pyc
+main.pyc
+models.pyc

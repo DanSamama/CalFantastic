@@ -3,6 +3,13 @@ var R = {};
 
 R.init = function(){
     $(document).ready(function(){
+
+        // $("#generateCalendar").on('click', function() {
+        //
+        //    R.generateWeek(0);
+        //
+        // });
+
         //Firing all the functions that we define from line 40
         R.sortBlockList();
         R.initRepository();
@@ -149,6 +156,7 @@ R.scheduleActivity = function(activity){
         console.log("i was first");
     }else{
         originalPrevId = originalPrev.attr("id");
+        originalNextId = originalNext.attr("id");
         originalPrev.attr("data-next",originalNextId);
         console.log("i was not first");
     }
@@ -177,7 +185,7 @@ R.scheduleActivity = function(activity){
         console.log("i am now first");
     }else{
         currentPrevId = prevActivity.attr("id");
-        prevActivity.attr("data-next",activity.id);
+        prevActivity.attr("data-next",activity.attr("id"));
         console.log("i am not first now ");
     }
 
