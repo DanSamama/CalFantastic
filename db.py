@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+import logging
 
 
 def getRepositoryActivities(programId, cohortId):

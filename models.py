@@ -1,5 +1,5 @@
 from google.appengine.ext import ndb
-
+import logging
 
 class Activity(ndb.Model):
     id = ndb.StringProperty()
@@ -18,10 +18,16 @@ class Activity(ndb.Model):
 
 
 class Calendar(ndb.Model):
-    project_starting_day = ndb.DateTimeProperty()
-    day_starting_hour = ndb.DateTimeProperty("%H")
-    day_ending_hour = ndb.DateTimeProperty("%H")
+    project_starting_day = ndb.StringProperty()
+    day_starting_hour = ndb.StringProperty()
+    day_ending_hour = ndb.StringProperty()
     status = ndb.StringProperty()
     cohort = ndb.StringProperty()
     program = ndb.StringProperty()
+
+
+
+
+
+
 

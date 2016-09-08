@@ -6,6 +6,7 @@ import db
 from webapp2_extras import routes
 from uuid import uuid4
 import jinja2
+import logging
 
 jinja_environment = jinja2.Environment(loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
 
@@ -16,7 +17,7 @@ def getAppVersion():
 
 # Generate an hash Id for every activity created
 def generateId():
-    return str(uuid4().hex)
+    return "slot-" + str(uuid4().hex)
 
 
 # Hard coded user
@@ -69,8 +70,35 @@ class CalendarForm(webapp2.RequestHandler):
         newCalendar.project_starting_day = self.request.get("project_starting_day")
         newCalendar.day_starting_hour = self.request.get("day_starting_hour")
         newCalendar.day_ending_hour = self.request.get("day_ending_hour")
+        newCalendar.status = self.request.get("status")
+        newCalendar.cohort = self.request.get("cohort")
+        newCalendar.program = self.request.get("program")
         newCalendar.put()
         self.response.write("calendar saved")
+
+
+class CreateDb(webapp2.RequestHandler):
+    def get(self):
+        activities = [{"title":"dan","type":"LECTURE","desc":"something...","time_slots":3},
+                      {"title": "tzvi", "type": "LECTURE", "desc": "something...", "time_slots": 3},
+                      {"title": "hilly", "type": "ASSIGNMENT", "desc": "something...", "time_slots": 2},
+                      {"title": "gilad", "type": "EXERCISE", "desc": "something...", "time_slots": 3},
+                      {"title": "shai", "type": "EXERCISE", "desc": "something...", "time_slots": 1},
+                      {"title": "dana", "type": "LECTURE", "desc": "something...", "time_slots": 1}
+                      ]
+
+        for a in activities:
+            newActivity = models.Activity()
+            newActivity.id = generateId()
+            newActivity.title = a['title']
+            newActivity.creator = getCurrentLoggedInUser(self)
+            newActivity.program = "bootcamp"
+            newActivity.cohort = "winter 2015"
+            newActivity.type = a['type']
+            newActivity.desc = a['desc']
+            newActivity.time_slots = a['time_slots']
+            newActivity.status = "IN_REPOSITORY"
+            newActivity.put()
 
 
 class ScheduleActivity(webapp2.RequestHandler):
@@ -78,6 +106,7 @@ class ScheduleActivity(webapp2.RequestHandler):
         activityId = self.request.get("activity_id")
         prevActivityId = self.request.get("prev_activity_id")
         nextActivityId = self.request.get("next_activity_id")
+        #PUSH THE EXTRA DATA
         activity = db.getActivityById(activityId)
         if activity:
             activity.status = "IN_CHRONOLIST"
@@ -85,6 +114,7 @@ class ScheduleActivity(webapp2.RequestHandler):
             activity.put()
         prevActivity = db.getActivityById(prevActivityId)
         prevActivity.next = activityId
+
         prevActivity.put()
 
 
@@ -95,3 +125,6 @@ app = webapp2.WSGIApplication([
     ('/schedule_activity', ScheduleActivity)
 
 ], debug=True)
+
+
+

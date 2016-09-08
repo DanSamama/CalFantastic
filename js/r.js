@@ -23,9 +23,14 @@ R.init = function(){
 
       $( ".block-list .container" ).sortable({
           revert: true,
+          start: function(event, ui){
+              item= ui.item;
+              newList = oldList = ui.item.parent();
+          },
           stop:function(event, ui){
               //Firing function line 64
-            R.scheduleActivity(ui.item);
+              // TODO hillies logic functions updating the next id
+            R.updateActivity(ui.item);
           },
   			"axis":"y",
 			  containment: "parent"
@@ -34,7 +39,27 @@ R.init = function(){
 		$( "ul, li" ).disableSelection();
 
   });
-}; 
+};
+
+$(".calendarButton").click(function() {
+    R.getFirstActivity = function () {
+
+        var activitiesInChronoList = $(".block-list" > li);
+        for(var i=0;i<activitiesInChronoList.length;i++){
+            if([i].prev() === -1){
+                var length = [i].time_slots;
+                var activityId = [i].id;
+                var nextActivityId = [i].next;
+                var activityDate = [i].project_starting_day;
+            }
+        }
+    };
+});
+
+
+
+
+
 
 //after clicking "add" activity form, it takes the slot that contains this "add btn" and append the slot to the "chronolist" container in the html
 R.initRepository = function(){
@@ -67,6 +92,19 @@ R.scheduleActivity = function(activity){
     $.get("/schedule_activity",{"activity_id":activity.attr("id"),"next_activity_id":nextActivity.attr("id"),"prev_activity_id":prevActivity.attr("id")},function(){
 
     });
+
+};
+
+R.updateActivity = function(activity){
+
+    //var prevActivity = activity.prev();
+    //var nextActivity = activity.next();
+    //TODO extra data week_num .. duration.. day_num..
+    $.get("/schedule_activity",{"activity_id":activity.attr("id"),"next_activity_id":nextActivity.attr("id"),"prev_activity_id":prevActivity.attr("id")},function(){
+
+    });
+
+    //$.get("/calendarForm", null, function(){ //logic including py form context} )
 };
 
 R.init();

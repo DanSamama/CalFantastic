@@ -34,13 +34,14 @@
 					<section class="repository">
 						<ul id="slots-container" class="container">
 							{% for activity in repository %}
-							<li id="{{activity.id}}" class="draggable shadowed {{activity.type|lower}} slot">{{activity.title}}
+							<li id="{{activity.id}}"
+                                class="draggable shadowed {{activity.type|lower}} slot">{{activity.title}}.
 							<button class="add">Add</button>
 							</li>
 							{% endfor %}
 						</ul>
 						<ul  class="container">
-							<li id="add-new" class=" clickable slot wide-btn"><i class="fa fa-plus"></i></li>
+							<li id="add-new" class=" clickable slot wide-btn"><i class="fa fa-plus"></i></li>0
 						</ul>
 					</section>
 				</div>
@@ -50,10 +51,13 @@
 							<section class="block-list">
 								<ul id="slots-container" class="container">
 									{% for activity in chrono_list %}
-									<li id="{{activity.id}}" data-next="{{activity.next}}" class="draggable shadowed {{activity.type|lower}} slot">{{activity.title}} - {{activity.next}}</li>
+									<li id="{{activity.id}}" data-next="{{activity.next}}"
+                                        class="draggable shadowed {{activity.type|lower}} slot">{{activity.title}} -
+                                        {{activity.next}}</li>
 									{% endfor %}
 								</ul>
 							</section>
+                            <button id="generateCalendar">Generate Calendar</button>
 						</div>
 						<div class="bottom-panel">
 							<section class="week-schedule">
